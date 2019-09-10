@@ -3,18 +3,22 @@
 	archiveVersion = 1;
 	classes = {
 	};
-	objectVersion = 50;
+	objectVersion = 51;
 	objects = {
 
 /* Begin PBXBuildFile section */
+		60C969F35254DDF632B17CF5 /* Pods_LottieExportDemo.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = FAC089111C3FBB75670CC454 /* Pods_LottieExportDemo.framework */; };
 		97B8D67C232798CD001333FE /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 97B8D67B232798CD001333FE /* AppDelegate.swift */; };
 		97B8D67E232798CD001333FE /* ViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 97B8D67D232798CD001333FE /* ViewController.swift */; };
 		97B8D681232798CD001333FE /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 97B8D67F232798CD001333FE /* Main.storyboard */; };
 		97B8D683232798D3001333FE /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 97B8D682232798D3001333FE /* Assets.xcassets */; };
 		97B8D686232798D3001333FE /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 97B8D684232798D3001333FE /* LaunchScreen.storyboard */; };
+		97B8D99F2327AEF2001333FE /* poppets.mov in Resources */ = {isa = PBXBuildFile; fileRef = 97B8D99E2327AEF2001333FE /* poppets.mov */; };
+		97B8D9A12327B309001333FE /* kanye.png in Resources */ = {isa = PBXBuildFile; fileRef = 97B8D9A02327B308001333FE /* kanye.png */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
+		8DB9AB2B9E8974AC548B363E /* Pods-LottieExportDemo.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-LottieExportDemo.debug.xcconfig"; path = "Target Support Files/Pods-LottieExportDemo/Pods-LottieExportDemo.debug.xcconfig"; sourceTree = "<group>"; };
 		97B8D678232798CD001333FE /* LottieExportDemo.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = LottieExportDemo.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		97B8D67B232798CD001333FE /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		97B8D67D232798CD001333FE /* ViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ViewController.swift; sourceTree = "<group>"; };
@@ -22,6 +26,10 @@
 		97B8D682232798D3001333FE /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		97B8D685232798D3001333FE /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/LaunchScreen.storyboard; sourceTree = "<group>"; };
 		97B8D687232798D3001333FE /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		97B8D99E2327AEF2001333FE /* poppets.mov */ = {isa = PBXFileReference; lastKnownFileType = video.quicktime; path = poppets.mov; sourceTree = "<group>"; };
+		97B8D9A02327B308001333FE /* kanye.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = kanye.png; sourceTree = "<group>"; };
+		A7E9F5BAD31D30C8F1966047 /* Pods-LottieExportDemo.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-LottieExportDemo.release.xcconfig"; path = "Target Support Files/Pods-LottieExportDemo/Pods-LottieExportDemo.release.xcconfig"; sourceTree = "<group>"; };
+		FAC089111C3FBB75670CC454 /* Pods_LottieExportDemo.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_LottieExportDemo.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -29,17 +37,29 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				60C969F35254DDF632B17CF5 /* Pods_LottieExportDemo.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
+		22CBD983649E2DBC2E005A55 /* Pods */ = {
+			isa = PBXGroup;
+			children = (
+				8DB9AB2B9E8974AC548B363E /* Pods-LottieExportDemo.debug.xcconfig */,
+				A7E9F5BAD31D30C8F1966047 /* Pods-LottieExportDemo.release.xcconfig */,
+			);
+			path = Pods;
+			sourceTree = "<group>";
+		};
 		97B8D66F232798CD001333FE = {
 			isa = PBXGroup;
 			children = (
 				97B8D67A232798CD001333FE /* LottieExportDemo */,
 				97B8D679232798CD001333FE /* Products */,
+				22CBD983649E2DBC2E005A55 /* Pods */,
+				A1DF442DA12C082586996C0F /* Frameworks */,
 			);
 			sourceTree = "<group>";
 		};
@@ -56,12 +76,22 @@
 			children = (
 				97B8D67B232798CD001333FE /* AppDelegate.swift */,
 				97B8D67D232798CD001333FE /* ViewController.swift */,
+				97B8D99E2327AEF2001333FE /* poppets.mov */,
+				97B8D9A02327B308001333FE /* kanye.png */,
 				97B8D67F232798CD001333FE /* Main.storyboard */,
 				97B8D682232798D3001333FE /* Assets.xcassets */,
 				97B8D684232798D3001333FE /* LaunchScreen.storyboard */,
 				97B8D687232798D3001333FE /* Info.plist */,
 			);
 			path = LottieExportDemo;
+			sourceTree = "<group>";
+		};
+		A1DF442DA12C082586996C0F /* Frameworks */ = {
+			isa = PBXGroup;
+			children = (
+				FAC089111C3FBB75670CC454 /* Pods_LottieExportDemo.framework */,
+			);
+			name = Frameworks;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -71,9 +101,11 @@
 			isa = PBXNativeTarget;
 			buildConfigurationList = 97B8D68A232798D3001333FE /* Build configuration list for PBXNativeTarget "LottieExportDemo" */;
 			buildPhases = (
+				041493D14B61555B798E9ECB /* [CP] Check Pods Manifest.lock */,
 				97B8D674232798CD001333FE /* Sources */,
 				97B8D675232798CD001333FE /* Frameworks */,
 				97B8D676232798CD001333FE /* Resources */,
+				B6C907747BC7437540CDF5AB /* [CP] Embed Pods Frameworks */,
 			);
 			buildRules = (
 			);
@@ -122,13 +154,57 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				97B8D9A12327B309001333FE /* kanye.png in Resources */,
 				97B8D686232798D3001333FE /* LaunchScreen.storyboard in Resources */,
 				97B8D683232798D3001333FE /* Assets.xcassets in Resources */,
+				97B8D99F2327AEF2001333FE /* poppets.mov in Resources */,
 				97B8D681232798CD001333FE /* Main.storyboard in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 /* End PBXResourcesBuildPhase section */
+
+/* Begin PBXShellScriptBuildPhase section */
+		041493D14B61555B798E9ECB /* [CP] Check Pods Manifest.lock */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputFileListPaths = (
+			);
+			inputPaths = (
+				"${PODS_PODFILE_DIR_PATH}/Podfile.lock",
+				"${PODS_ROOT}/Manifest.lock",
+			);
+			name = "[CP] Check Pods Manifest.lock";
+			outputFileListPaths = (
+			);
+			outputPaths = (
+				"$(DERIVED_FILE_DIR)/Pods-LottieExportDemo-checkManifestLockResult.txt",
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "diff \"${PODS_PODFILE_DIR_PATH}/Podfile.lock\" \"${PODS_ROOT}/Manifest.lock\" > /dev/null\nif [ $? != 0 ] ; then\n    # print error to STDERR\n    echo \"error: The sandbox is not in sync with the Podfile.lock. Run 'pod install' or update your CocoaPods installation.\" >&2\n    exit 1\nfi\n# This output is used by Xcode 'outputs' to avoid re-running this script phase.\necho \"SUCCESS\" > \"${SCRIPT_OUTPUT_FILE_0}\"\n";
+			showEnvVarsInLog = 0;
+		};
+		B6C907747BC7437540CDF5AB /* [CP] Embed Pods Frameworks */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputFileListPaths = (
+				"${PODS_ROOT}/Target Support Files/Pods-LottieExportDemo/Pods-LottieExportDemo-frameworks-${CONFIGURATION}-input-files.xcfilelist",
+			);
+			name = "[CP] Embed Pods Frameworks";
+			outputFileListPaths = (
+				"${PODS_ROOT}/Target Support Files/Pods-LottieExportDemo/Pods-LottieExportDemo-frameworks-${CONFIGURATION}-output-files.xcfilelist",
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "\"${PODS_ROOT}/Target Support Files/Pods-LottieExportDemo/Pods-LottieExportDemo-frameworks.sh\"\n";
+			showEnvVarsInLog = 0;
+		};
+/* End PBXShellScriptBuildPhase section */
 
 /* Begin PBXSourcesBuildPhase section */
 		97B8D674232798CD001333FE /* Sources */ = {
@@ -280,6 +356,7 @@
 		};
 		97B8D68B232798D3001333FE /* Debug */ = {
 			isa = XCBuildConfiguration;
+			baseConfigurationReference = 8DB9AB2B9E8974AC548B363E /* Pods-LottieExportDemo.debug.xcconfig */;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CODE_SIGN_STYLE = Automatic;
@@ -298,6 +375,7 @@
 		};
 		97B8D68C232798D3001333FE /* Release */ = {
 			isa = XCBuildConfiguration;
+			baseConfigurationReference = A7E9F5BAD31D30C8F1966047 /* Pods-LottieExportDemo.release.xcconfig */;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CODE_SIGN_STYLE = Automatic;
