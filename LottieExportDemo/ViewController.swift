@@ -14,9 +14,11 @@ import AVKit
 
 class ViewController: UIViewController {
     var animation: Animation?
+    var button: UIButton?
 
     override func viewDidLoad() {
         super.viewDidLoad()
+        
         
         Animation.loadedFrom(url: URL(string: "https://assets9.lottiefiles.com/packages/lf20_dH29dn.json")!,
                              closure: { animation in self.animationLoaded(newAnimation: animation) },
@@ -35,9 +37,20 @@ class ViewController: UIViewController {
         
         animation = newAnimation
         startExport()
+        
+        button = UIButton(frame: CGRect(x: 0, y: 0, width: 200, height: 50))
+        button?.backgroundColor = .lightGray
+        
+        button?.setTitle("Start export", for: .normal)
+        button?.addTarget(self, action: #selector(startExport), for: .touchUpInside)
+     
+        button?.center = view.center
+        button?.frame.origin.y = button!.frame.origin.y + 200
+
+        view.addSubview(button!)
     }
     
-    func startExport() {
+    @objc func startExport() {
         guard let animation = animation else {
             print("Set up Animation first")
             return
@@ -140,8 +153,12 @@ class ViewController: UIViewController {
             
             let startTime = Date()
             
+            self.toggleButton(needEnable: false)
+
             exportSession.exportAsynchronously {
                 print("- \(startTime.timeIntervalSinceNow * -1) seconds elapsed for processing")
+                
+                self.toggleButton(needEnable: true)
                 
                 if exportSession.status.rawValue == 4 {
                     print("Export failed -> Reason: \(exportSession.error!.localizedDescription))")
@@ -153,7 +170,13 @@ class ViewController: UIViewController {
             }
         }
     }
-
+        
+    func toggleButton(needEnable: Bool) {
+        DispatchQueue.main.async {
+            self.button?.setTitle(needEnable ? "Start export" : "Processing...", for: .normal)
+            self.button?.isEnabled = needEnable
+        }
+    }
     
     func playVideo(url: URL) {
         DispatchQueue.main.async {
