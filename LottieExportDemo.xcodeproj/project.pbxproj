@@ -15,6 +15,7 @@
 		97B8D686232798D3001333FE /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 97B8D684232798D3001333FE /* LaunchScreen.storyboard */; };
 		97B8D99F2327AEF2001333FE /* poppets.mov in Resources */ = {isa = PBXBuildFile; fileRef = 97B8D99E2327AEF2001333FE /* poppets.mov */; };
 		97B8D9A12327B309001333FE /* kanye.png in Resources */ = {isa = PBXBuildFile; fileRef = 97B8D9A02327B308001333FE /* kanye.png */; };
+		97DB8156232A3F5B009291BB /* Helpers.swift in Sources */ = {isa = PBXBuildFile; fileRef = 97DB8155232A3F5B009291BB /* Helpers.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -28,6 +29,7 @@
 		97B8D687232798D3001333FE /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		97B8D99E2327AEF2001333FE /* poppets.mov */ = {isa = PBXFileReference; lastKnownFileType = video.quicktime; path = poppets.mov; sourceTree = "<group>"; };
 		97B8D9A02327B308001333FE /* kanye.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = kanye.png; sourceTree = "<group>"; };
+		97DB8155232A3F5B009291BB /* Helpers.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Helpers.swift; sourceTree = "<group>"; };
 		A7E9F5BAD31D30C8F1966047 /* Pods-LottieExportDemo.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-LottieExportDemo.release.xcconfig"; path = "Target Support Files/Pods-LottieExportDemo/Pods-LottieExportDemo.release.xcconfig"; sourceTree = "<group>"; };
 		FAC089111C3FBB75670CC454 /* Pods_LottieExportDemo.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_LottieExportDemo.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
@@ -76,6 +78,7 @@
 			children = (
 				97B8D67B232798CD001333FE /* AppDelegate.swift */,
 				97B8D67D232798CD001333FE /* ViewController.swift */,
+				97DB8155232A3F5B009291BB /* Helpers.swift */,
 				97B8D99E2327AEF2001333FE /* poppets.mov */,
 				97B8D9A02327B308001333FE /* kanye.png */,
 				97B8D67F232798CD001333FE /* Main.storyboard */,
@@ -212,6 +215,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				97B8D67E232798CD001333FE /* ViewController.swift in Sources */,
+				97DB8156232A3F5B009291BB /* Helpers.swift in Sources */,
 				97B8D67C232798CD001333FE /* AppDelegate.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
