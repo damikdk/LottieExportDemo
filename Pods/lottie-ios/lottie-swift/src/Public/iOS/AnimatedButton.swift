@@ -6,6 +6,7 @@
 //
 
 import Foundation
+#if os(iOS) || os(tvOS) || os(watchOS)
 import UIKit
 /**
  An interactive button that plays an animation when pressed.
@@ -47,7 +48,6 @@ final public class AnimatedButton: AnimatedControl {
     if let playrange = rangesForEvents[touchEvent.rawValue] {
       animationView.play(fromProgress: playrange.from, toProgress: playrange.to, loopMode: LottieLoopMode.playOnce)
     }
-    sendActions(for: touchEvent)
     return true
   }
   
@@ -63,6 +63,6 @@ final public class AnimatedButton: AnimatedControl {
     if let playrange = rangesForEvents[touchEvent.rawValue] {
       animationView.play(fromProgress: playrange.from, toProgress: playrange.to, loopMode: LottieLoopMode.playOnce)
     }
-    sendActions(for: touchEvent)
   }
 }
+#endif

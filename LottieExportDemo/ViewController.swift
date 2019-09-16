@@ -14,14 +14,16 @@ import AVKit
 class ViewController: UIViewController {
     var animationView: AnimationView?
     var animation: Animation?
-    var button: UIButton?
+    
+    var exportButton: UIButton?
+    var oldExportButton: UIButton?
+
     let size = UIScreen.main.bounds.size
 
     private var videoWriter: AVAssetWriter?
     
     override func viewDidLoad() {
         super.viewDidLoad()
-        
         
         Animation.loadedFrom(url: URL(string: "https://assets9.lottiefiles.com/packages/lf20_dH29dn.json")!,
                              closure: { animation in self.animationLoaded(newAnimation: animation) },
@@ -40,18 +42,8 @@ class ViewController: UIViewController {
         
         animation = newAnimation
         startExport()
-//        try? oldExport()
         
-        button = UIButton(frame: CGRect(x: 0, y: 0, width: 200, height: 50))
-        button?.backgroundColor = .lightGray
-        
-        button?.setTitle("Start export", for: .normal)
-        button?.addTarget(self, action: #selector(startExport), for: .touchUpInside)
-        
-        button?.center = view.center
-        button?.frame.origin.y = button!.frame.origin.y + 200
-        
-        view.addSubview(button!)
+        addButtons()
     }
     
     @objc func startExport() {
@@ -103,7 +95,7 @@ class ViewController: UIViewController {
         
         /// Set up effects for current layer (video)
         let layerIntruction = AVMutableVideoCompositionLayerInstruction(assetTrack: compositionVideoTrack!)
-        layerIntruction.setOpacity(1, at: .zero)
+        layerIntruction.setOpacity(0, at: .zero)
         
         /// Add effects to global instructions
         instructions.layerInstructions.append(layerIntruction)
@@ -134,7 +126,8 @@ class ViewController: UIViewController {
         animationView.animation = animation
         animationView.loopMode = .loop
         animationView.respectAnimationFrameRate = true
-        
+        animationView.backgroundBehavior = .pauseAndRestore
+
         let animationLayer = animationView.layer
         animationLayer.frame = frame
         animationLayer.layoutSublayers()
@@ -155,12 +148,12 @@ class ViewController: UIViewController {
             
             let startTime = Date()
             
-            self.toggleButton(needEnable: false)
+            self.toggleExportButton(needEnable: false)
             
             exportSession.exportAsynchronously {
                 print("- \(startTime.timeIntervalSinceNow * -1) seconds elapsed for processing")
                 
-                self.toggleButton(needEnable: true)
+                self.toggleExportButton(needEnable: true)
                 
                 if exportSession.status.rawValue == 4 {
                     print("Export failed -> Reason: \(exportSession.error!.localizedDescription))")
@@ -174,6 +167,8 @@ class ViewController: UIViewController {
     }
     
     @objc func oldExport() throws {
+        self.toggleOldExportButton(needEnable: false)
+
         let paths = FileManager.default.urls(for: .documentDirectory, in: .userDomainMask)
         let documentsDirectory = paths[0]
         let outputURL = documentsDirectory.appendingPathComponent("processed.mov")
@@ -223,12 +218,13 @@ class ViewController: UIViewController {
         videoWriter.add(videoWriterInput)
         
         if videoWriter.startWriting() {
+            let startTime = Date()
             videoWriter.startSession(atSourceTime: CMTime.zero)
             assert(pixelBufferAdaptor.pixelBufferPool != nil)
             
-            let startTime = Date()
-                        
-            videoWriterInput.requestMediaDataWhenReady(on: .main, using: {
+            let writeQueue = DispatchQueue(label: "writeQueue", qos: .userInteractive)
+            
+            videoWriterInput.requestMediaDataWhenReady(on: writeQueue, using: {
                 let frameDuration = CMTimeMake(value: 1, timescale: Int32(fps))
                 var frameCount: Int64 = 0
                 
@@ -237,28 +233,30 @@ class ViewController: UIViewController {
                  */
                 while(Int(frameCount) < Int(framesMax)) {
                     if videoWriterInput.isReadyForMoreMediaData {
-                        let lastFrameTime = CMTimeMake(value: frameCount, timescale: Int32(fps))
-                        let presentationTime = frameCount == 0 ? lastFrameTime : CMTimeAdd(lastFrameTime, frameDuration)
-                        
-                        // Set up Lottie
-                        self.animationView?.currentProgress = CGFloat(frameCount) / framesMax
-                                               
-                        UIGraphicsBeginImageContextWithOptions(self.size, false, 0.0)
-                        self.view.drawHierarchy(in: CGRect(x:0, y:0, width: self.size.width, height: self.size.height),
-                                                afterScreenUpdates: true)
-                        
-                        let image = UIGraphicsGetImageFromCurrentImageContext()
-                        UIGraphicsEndImageContext()
-                        
-                        do {
-                            try append(pixelBufferAdaptor: pixelBufferAdaptor,
-                                            with: image!,
-                                            at: presentationTime,
-                                            success: {
-                                                frameCount += 1
-                            })
-                        } catch {
-                        } // Do not throw here
+                        DispatchQueue.main.sync {
+                            let lastFrameTime = CMTimeMake(value: frameCount, timescale: Int32(fps))
+                            let presentationTime = frameCount == 0 ? lastFrameTime : CMTimeAdd(lastFrameTime, frameDuration)
+                            
+                            // Set up Lottie
+                            self.animationView?.currentProgress = CGFloat(frameCount) / framesMax
+
+                            UIGraphicsBeginImageContextWithOptions(self.size, false, 0.0)
+                            self.view.drawHierarchy(in: CGRect(origin: .zero, size: self.size),
+                                                    afterScreenUpdates: false)
+                            
+                            let image = UIGraphicsGetImageFromCurrentImageContext()
+                            UIGraphicsEndImageContext()
+                            
+                            do {
+                                try append(pixelBufferAdaptor: pixelBufferAdaptor,
+                                                with: image!,
+                                                at: presentationTime,
+                                                success: {
+                                                    frameCount += 1
+                                })
+                            } catch {
+                            } // Do not throw here
+                        }
                     }
                 }
                 
@@ -267,6 +265,8 @@ class ViewController: UIViewController {
                 videoWriter.finishWriting {
                     print("finishWriting")
                     print("--- finish in \(startTime.timeIntervalSinceNow * -1)")
+                    
+                    self.toggleOldExportButton(needEnable: true)
 
                     self.animationView?.loopMode = .loop
                     playVideo(url: videoWriter.outputURL)
@@ -275,11 +275,44 @@ class ViewController: UIViewController {
         }
     }
     
-    func toggleButton(needEnable: Bool) {
+    func toggleExportButton(needEnable: Bool) {
         DispatchQueue.main.async {
-            self.button?.setTitle(needEnable ? "Start export" : "Processing...", for: .normal)
-            self.button?.isEnabled = needEnable
+            self.exportButton?.setTitle(needEnable ? "Start AVAssetExportSession" : "Processing...", for: .normal)
+            self.exportButton?.isEnabled = needEnable
         }
-    }    
+    }
+    
+    func toggleOldExportButton(needEnable: Bool) {
+        DispatchQueue.main.async {
+            self.oldExportButton?.setTitle(needEnable ? "Start AVAssetWriter" : "Processing...", for: .normal)
+            self.oldExportButton?.isEnabled = needEnable
+        }
+    }
+    
+    func addButtons() {
+        let buttonSize = CGSize(width: 250, height: 50)
+        
+        exportButton = UIButton(frame: CGRect(origin: .zero, size: buttonSize))
+        exportButton?.backgroundColor = .lightGray
+        
+        exportButton?.setTitle("Start AVAssetExportSession", for: .normal)
+        exportButton?.addTarget(self, action: #selector(startExport), for: .touchUpInside)
+        
+        exportButton?.center = view.center
+        exportButton?.frame.origin.y = exportButton!.frame.origin.y + 200
+        
+        view.addSubview(exportButton!)
+        
+        oldExportButton = UIButton(frame: CGRect(origin: .zero, size: buttonSize))
+        oldExportButton?.backgroundColor = .lightGray
+        
+        oldExportButton?.setTitle("Start AVAssetWriter", for: .normal)
+        oldExportButton?.addTarget(self, action: #selector(oldExport), for: .touchUpInside)
+        
+        oldExportButton?.center = view.center
+        oldExportButton?.frame.origin.y = oldExportButton!.frame.origin.y + 260
+        
+        view.addSubview(oldExportButton!)
+    }
 }
 

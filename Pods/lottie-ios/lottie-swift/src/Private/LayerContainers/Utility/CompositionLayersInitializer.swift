@@ -10,7 +10,10 @@ import CoreGraphics
 
 extension Array where Element == LayerModel {
   
-  func initializeCompositionLayers(assetLibrary: AssetLibrary?, layerImageProvider: LayerImageProvider, frameRate: CGFloat) -> [CompositionLayer] {
+  func initializeCompositionLayers(assetLibrary: AssetLibrary?,
+                                   layerImageProvider: LayerImageProvider,
+                                   textProvider: AnimationTextProvider,
+                                   frameRate: CGFloat) -> [CompositionLayer] {
     var compositionLayers = [CompositionLayer]()
     var layerMap = [Int : CompositionLayer]()
     
@@ -18,7 +21,11 @@ extension Array where Element == LayerModel {
     var childLayers = [LayerModel]()
     
     for layer in self {
-      if let shapeLayer = layer as? ShapeLayerModel {
+      if layer.hidden == true {
+        let genericLayer = NullCompositionLayer(layer: layer)
+        compositionLayers.append(genericLayer)
+        layerMap[layer.index] = genericLayer
+      } else if let shapeLayer = layer as? ShapeLayerModel {
         let shapeContainer = ShapeCompositionLayer(shapeLayer: shapeLayer)
         compositionLayers.append(shapeContainer)
         layerMap[layer.index] = shapeContainer
@@ -32,6 +39,7 @@ extension Array where Element == LayerModel {
         let precompContainer = PreCompositionLayer(precomp: precompLayer,
                                                    asset: precompAsset,
                                                    layerImageProvider: layerImageProvider,
+                                                   textProvider: textProvider,
                                                    assetLibrary: assetLibrary,
                                                    frameRate: frameRate)
         compositionLayers.append(precompContainer)
@@ -43,7 +51,7 @@ extension Array where Element == LayerModel {
         compositionLayers.append(imageContainer)
         layerMap[layer.index] = imageContainer
       } else if let textLayer = layer as? TextLayerModel {
-        let textContainer = TextCompositionLayer(textLayer: textLayer)
+        let textContainer = TextCompositionLayer(textLayer: textLayer, textProvider: textProvider)
         compositionLayers.append(textContainer)
         layerMap[layer.index] = textContainer
       } else {

@@ -1,6 +1,6 @@
 ## LottieExportDemo
 
-This is demo project with Lottie animation exported with AVAssetExportSession. It's not work right now
+Demo project with Lottie-animation export with both `AVAssetExportSession` and `AVAssetWriter`. `AVAssetWriter` works fine, but `AVAssetExportSession` doesn't.
 
 ### How to run
 1. Run `pod install` for Lottie-iOS
@@ -11,4 +11,6 @@ guard self.window != nil
 3. Run
 
 ### What will happen then
-You will see glorious 60 FPS Heart animation and export will be started immediately. But animation in result video will be much slower.
+You will see glorious 60 FPS animation and `AVAssetExportSession` export will be started immediately. But result animation will be much slower.
+
+![screenshot](https://i.imgsafe.org/f2/f2de7107e4.jpeg)

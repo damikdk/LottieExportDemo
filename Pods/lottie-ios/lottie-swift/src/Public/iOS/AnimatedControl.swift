@@ -6,6 +6,7 @@
 //
 
 import Foundation
+#if os(iOS) || os(tvOS) || os(watchOS)
 import UIKit
 
 /**
@@ -44,6 +45,11 @@ open class AnimatedControl: UIControl {
   public func setLayer(named: String, forState: UIControl.State) {
     stateMap[forState.rawValue] = named
     updateForState()
+  }
+
+  /// Sets a ValueProvider for the specified keypath
+  public func setValueProvider(_ valueProvider: AnyValueProvider, keypath: AnimationKeypath) {
+    animationView.setValueProvider(valueProvider, keypath: keypath)
   }
   
   // MARK: Initializers
@@ -123,6 +129,7 @@ open class AnimatedControl: UIControl {
     animationView.clipsToBounds = false
     clipsToBounds = true
     animationView.translatesAutoresizingMaskIntoConstraints = false
+    animationView.backgroundBehavior = .forceFinish
     addSubview(animationView)
     animationView.contentMode = .scaleAspectFit
     animationView.isUserInteractionEnabled = false
@@ -148,3 +155,4 @@ open class AnimatedControl: UIControl {
   }
   
 }
+#endif
