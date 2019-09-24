@@ -42,8 +42,12 @@ func saveToLibrary(url: URL?) {
 func append(pixelBufferAdaptor adaptor: AVAssetWriterInputPixelBufferAdaptor, with image: UIImage, at presentationTime: CMTime, success: @escaping (() -> ())) throws {
     do {
         if let pixelBufferPool = adaptor.pixelBufferPool {
-            let pixelBufferPointer = UnsafeMutablePointer<CVPixelBuffer?>.allocate(capacity: 1)
-            let status = CVPixelBufferPoolCreatePixelBuffer(kCFAllocatorDefault, pixelBufferPool, pixelBufferPointer)
+            let pixelBufferPointer = UnsafeMutablePointer<CVPixelBuffer?>.allocate(capacity: MemoryLayout<CVPixelBuffer?>.size)
+            let status: CVReturn = CVPixelBufferPoolCreatePixelBuffer(
+              kCFAllocatorDefault,
+              pixelBufferPool,
+              pixelBufferPointer
+            )
             guard let pixelBuffer = pixelBufferPointer.pointee else {
                 return
             }
@@ -53,11 +57,12 @@ func append(pixelBufferAdaptor adaptor: AVAssetWriterInputPixelBufferAdaptor, wi
             
             fill(pixelBuffer: pixelBuffer, with: image)
             if adaptor.append(pixelBuffer, withPresentationTime: presentationTime) {
-              pixelBufferPointer.deinitialize(count:1)
-                pixelBufferPointer.deallocate()
+                pixelBufferPointer.deinitialize(count:1)
                 success()
             } else {
             }
+            
+            pixelBufferPointer.deallocate()
         }
     } catch let error {
         throw error
@@ -65,22 +70,52 @@ func append(pixelBufferAdaptor adaptor: AVAssetWriterInputPixelBufferAdaptor, wi
 }
 
 // Populates the pixel buffer with the contents of the current image
-private func fill(pixelBuffer buffer: CVPixelBuffer, with image: UIImage) {
-    CVPixelBufferLockBaseAddress(buffer, CVPixelBufferLockFlags(rawValue: CVOptionFlags(0)))
+private func fill(pixelBuffer: CVPixelBuffer, with image: UIImage) {
+    // lock the buffer memoty so no one can access it during manipulation
+    CVPixelBufferLockBaseAddress(pixelBuffer, CVPixelBufferLockFlags(rawValue: CVOptionFlags(0)))
     
-    guard let context = CGContext(
-        data: CVPixelBufferGetBaseAddress(buffer),
-        width: Int(image.size.width),
-        height: Int(image.size.height),
-        bitsPerComponent: 8,
-        bytesPerRow: CVPixelBufferGetBytesPerRow(buffer),
-        space: CGColorSpaceCreateDeviceRGB(),
-        bitmapInfo: CGImageAlphaInfo.premultipliedFirst.rawValue
-        ) else { return }
-    guard let cgImage = image.cgImage else { return }
+    // get the pixel data from the address in the memory
+    let pixelData = CVPixelBufferGetBaseAddress(pixelBuffer)
     
-    let rect = CGRect(origin: .zero, size: image.size)
-    context.draw(cgImage, in: rect)
+    // create a color scheme
+    let rgbColorSpace = CGColorSpaceCreateDeviceRGB()
     
-    CVPixelBufferUnlockBaseAddress(buffer, CVPixelBufferLockFlags(rawValue: CVOptionFlags(0)))
+    /// set the context size
+    let contextSize = image.size
+    
+    // generate a context where the image will be drawn
+    if let context = CGContext(data: pixelData,
+                               width: Int(contextSize.width),
+                               height: Int(contextSize.height),
+                               bitsPerComponent: 8,
+                               bytesPerRow: CVPixelBufferGetBytesPerRow(pixelBuffer),
+                               space: rgbColorSpace,
+                               bitmapInfo: CGImageAlphaInfo.noneSkipFirst.rawValue) {
+        
+        var imageHeight = image.size.height
+        var imageWidth = image.size.width
+        
+        if Int(imageHeight) > context.height {
+            imageHeight = 16 * (CGFloat(context.height) / 16).rounded(.awayFromZero)
+        } else if Int(imageWidth) > context.width {
+            imageWidth = 16 * (CGFloat(context.width) / 16).rounded(.awayFromZero)
+        }
+        
+        let center = CGPoint.zero
+        
+        context.clear(CGRect(x: 0.0, y: 0.0, width: imageWidth, height: imageHeight))
+        
+        // set the context's background color
+        context.fill(CGRect(x: 0.0, y: 0.0, width: CGFloat(context.width), height: CGFloat(context.height)))
+        context.concatenate(.identity)
+        
+        // draw the image in the context
+        
+        if let cgImage = image.cgImage {
+            context.draw(cgImage, in: CGRect(x: center.x, y: center.y, width: imageWidth, height: imageHeight))
+        }
+        
+        // unlock the buffer memory
+        CVPixelBufferUnlockBaseAddress(pixelBuffer, CVPixelBufferLockFlags(rawValue: CVOptionFlags(0)))
+    }
 }
