@@ -12,8 +12,8 @@ import AVKit
 
 
 class ViewController: UIViewController {
-    var animationView: AnimationView?
-    var animation: Animation?
+    var animationView: LOTAnimationView?
+    //var animation: LOTAnimation?
     
     var exportButton: UIButton?
     var oldExportButton: UIButton?
@@ -26,42 +26,46 @@ class ViewController: UIViewController {
         super.viewDidLoad()
         
         view.backgroundColor = .black
-        Animation.loadedFrom(url: URL(string: "https://assets9.lottiefiles.com/packages/lf20_dH29dn.json")!,
-                             closure: { animation in self.animationLoaded(newAnimation: animation) },
-                             animationCache: nil)
+        animationLoaded()
+//        LOTAnimation.loadedFrom(url: URL(string: "https://assets9.lottiefiles.com/packages/lf20_dH29dn.json")!,
+//                             closure: { animation in self.animationLoaded(newAnimation: animation) },
+//                             animationCache: nil)
     }
     
-    func animationLoaded(newAnimation: Animation?) {
-        animationView = AnimationView(animation: newAnimation)
+    func animationLoaded() {
+        
+        animationView = LOTAnimationView(name: "Bubbles1")
         animationView?.frame = CGRect(x: 0, y: 0, width: 300, height: 300)
         animationView?.center = view.center
         
-        animationView?.loopMode = .loop
+        //animationView?.loopMode = .loop
         animationView?.play()
+        animationView?.loopAnimation = true
         
         view.addSubview(animationView!)
         
-        animation = newAnimation
-        startExport()
+        //animation = newAnimation
+        //startExport()
         
         addButtons()
     }
     
     @objc func startExport() {
-        guard let animation = animation else {
-            print("Set up Animation first")
-            return
-        }
+//        guard let animation = animation else {
+//            print("Set up Animation first")
+//            return
+//        }
         
         let bundleURL = Bundle.main.resourceURL!
         let documentsDirectory = FileManager.default.urls(for: .documentDirectory, in: .userDomainMask)[0]
         let outputURL = documentsDirectory.appendingPathComponent("processed.mov")
         try? FileManager.default.removeItem(at: outputURL)
         
-        let duration = CMTime(seconds: animation.duration, preferredTimescale: 600)
+        let duration = CMTime(seconds: Double(animationView!.animationDuration), preferredTimescale: 600)
         
         /// Create composition
         let compositionRect = CGRect(x: 0, y: 0, width: size.width, height: size.height)
+        // fixme
         let timerange: CMTimeRange = CMTimeRange(start: .zero, duration: duration)
         
         let composition = AVMutableComposition()
@@ -102,11 +106,11 @@ class ViewController: UIViewController {
         instructions.layerInstructions.append(layerIntruction)
         
         /// Add Lottie
-        addLottieLayer(animation: animation, to: parentLayer, with: compositionRect)
+        addLottieLayer(to: parentLayer, with: compositionRect)
         
         /// Set up composition size and framerate
         videoComposition.instructions = [instructions]
-        videoComposition.frameDuration = CMTimeMake(value: 1, timescale: Int32(animation.framerate));
+        videoComposition.frameDuration = CMTimeMake(value: 1, timescale: Int32(24));
         videoComposition.renderSize = size
         videoComposition.animationTool = AVVideoCompositionCoreAnimationTool(postProcessingAsVideoLayer: videoCALayer, in: parentLayer)
         
@@ -119,22 +123,24 @@ class ViewController: UIViewController {
         }
     }
     
-    func addLottieLayer(animation: Animation,
+    func addLottieLayer(
                    to layer: CALayer,
                    with frame: CGRect) {
-        
-        let animationView = AnimationView()
-        animationView.animation = animation
-        animationView.loopMode = .loop
-        animationView.respectAnimationFrameRate = true
-        animationView.backgroundBehavior = .pauseAndRestore
 
-        let animationLayer = animationView.layer
-        animationLayer.frame = frame
-        animationLayer.layoutSublayers()
+//        let animationView = AnimationView()
+//        animationView.animation = animation
+//        animationView.loopMode = .loop
+//        animationView.respectAnimationFrameRate = true
+//        animationView.backgroundBehavior = .pauseAndRestore
+//
+//        let animationLayer = animationView.layer
+//        animationLayer.frame = frame
+//        animationLayer.layoutSublayers()
+
+//        layer.addSublayer(animationLayer)
+        animationView!.play()
         
-        layer.addSublayer(animationLayer)
-        animationView.play()
+        layer.addSublayer(animationView!.layer)
     }
     
     func export(composition: AVMutableComposition,
@@ -163,117 +169,6 @@ class ViewController: UIViewController {
                 
                 completion?(outputUrl)
             }
-        }
-    }
-    
-    @objc func oldExport() throws {
-        self.toggleOldExportButton(needEnable: false)
-
-        let paths = FileManager.default.urls(for: .documentDirectory, in: .userDomainMask)
-        let documentsDirectory = paths[0]
-        let outputURL = documentsDirectory.appendingPathComponent("processed.mov")
-        try? FileManager.default.removeItem(at: outputURL)
-        
-        let fps = Int64(animation?.framerate ?? 30)
-        var framesMax = CGFloat(fps)
-                        
-        if let animation = animation {
-            framesMax = CGFloat(animation.duration * Double(fps))
-        }
-        
-        animationView?.loopMode = .playOnce
-        animationView?.stop()
-                
-        /*
-         * Set up VideoWriter
-         */
-        do {
-            try videoWriter = AVAssetWriter(outputURL: outputURL, fileType: AVFileType.mov)
-        } catch let error {
-            throw(error)
-        }
-        
-        guard let videoWriter = videoWriter else {
-            return
-        }
-        
-        let videoSettings: [String : Any] = [
-            AVVideoCodecKey : AVVideoCodecType.h264,
-            AVVideoWidthKey : size.width,
-            AVVideoHeightKey : size.height,
-        ]
-        
-        let videoWriterInput = AVAssetWriterInput(mediaType: AVMediaType.video, outputSettings: videoSettings)
-        
-        let sourceBufferAttributes: [String : Any] = [
-            (kCVPixelBufferPixelFormatTypeKey as String): Int(kCVPixelFormatType_32ARGB),
-            (kCVPixelBufferWidthKey as String): Float(size.width),
-            (kCVPixelBufferHeightKey as String): Float(size.height)
-        ]
-        
-        let pixelBufferAdaptor = AVAssetWriterInputPixelBufferAdaptor(assetWriterInput: videoWriterInput,
-                                                                      sourcePixelBufferAttributes: sourceBufferAttributes)
-        
-        assert(videoWriter.canAdd(videoWriterInput))
-        videoWriter.add(videoWriterInput)
-        
-        if videoWriter.startWriting() {
-            let startTime = Date()
-            videoWriter.startSession(atSourceTime: CMTime.zero)
-            assert(pixelBufferAdaptor.pixelBufferPool != nil)
-            
-            let writeQueue = DispatchQueue(label: "writeQueue", qos: .userInteractive)
-            
-            videoWriterInput.requestMediaDataWhenReady(on: writeQueue, using: {
-                let frameDuration = CMTimeMake(value: 1, timescale: Int32(fps))
-                var frameCount: Int64 = 0
-                
-                /*
-                 * Start render loop
-                 */
-                while(Int(frameCount) < Int(framesMax)) {
-                    if videoWriterInput.isReadyForMoreMediaData {
-                        DispatchQueue.main.sync {
-                            let lastFrameTime = CMTimeMake(value: frameCount, timescale: Int32(fps))
-                            let presentationTime = frameCount == 0 ? lastFrameTime : CMTimeAdd(lastFrameTime, frameDuration)
-                            
-                            // Set up Lottie
-                            self.animationView?.currentProgress = CGFloat(frameCount) / framesMax
-
-                            UIGraphicsBeginImageContextWithOptions(self.size, false, 0.0)
-                            
-                            if let animationView = self.animationView {
-                                animationView.drawHierarchy(in: animationView.frame,
-                                                            afterScreenUpdates: false)
-                            }
-                            
-                            let image = UIGraphicsGetImageFromCurrentImageContext()
-                            UIGraphicsEndImageContext()
-                            
-                            do {
-                                try append(pixelBufferAdaptor: pixelBufferAdaptor,
-                                                with: image!,
-                                                at: presentationTime,
-                                                success: {
-                                                    frameCount += 1
-                                })
-                            } catch {
-                            } // Do not throw here
-                        }
-                    }
-                }
-                
-                videoWriterInput.markAsFinished()
-                
-                videoWriter.finishWriting {
-                    print("--- \(startTime.timeIntervalSinceNow * -1) seconds elapsed for AVAssetWriterInput")
-                    
-                    self.toggleOldExportButton(needEnable: true)
-
-                    self.animationView?.loopMode = .loop
-                    playVideo(url: videoWriter.outputURL)
-                }
-            })
         }
     }
 }
@@ -310,7 +205,7 @@ extension ViewController {
         oldExportButton = UIButton(frame: CGRect(origin: .zero, size: buttonSize))
         
         oldExportButton?.setTitle("Start AVAssetWriter", for: .normal)
-        oldExportButton?.addTarget(self, action: #selector(oldExport), for: .touchUpInside)
+        //oldExportButton?.addTarget(self, action: #selector(nil), for: .touchUpInside)
         
         oldExportButton?.center = view.center
         oldExportButton?.frame.origin.y = oldExportButton!.frame.origin.y + 240

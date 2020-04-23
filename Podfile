@@ -6,6 +6,6 @@ target 'LottieExportDemo' do
   use_frameworks!
 
   # Pods for LottieExportDemo
-  pod 'lottie-ios'
+  pod 'lottie-ios', '2.5.0'
 
 end
