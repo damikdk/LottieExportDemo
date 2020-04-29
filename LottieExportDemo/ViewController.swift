@@ -10,6 +10,8 @@ import UIKit
 import Lottie
 import AVKit
 
+var _layer: AnimationView?
+var _duration: TimeInterval?
 
 class ViewController: UIViewController {
     var animationView: AnimationView?
@@ -25,8 +27,9 @@ class ViewController: UIViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         
+		
         view.backgroundColor = .black
-        Animation.loadedFrom(url: URL(string: "https://assets9.lottiefiles.com/packages/lf20_dH29dn.json")!,
+		Animation.loadedFrom(url: Bundle.main.url(forResource: "Bubbles1", withExtension: "json")!,
                              closure: { animation in self.animationLoaded(newAnimation: animation) },
                              animationCache: nil)
     }
@@ -36,13 +39,13 @@ class ViewController: UIViewController {
         animationView?.frame = CGRect(x: 0, y: 0, width: 300, height: 300)
         animationView?.center = view.center
         
-        animationView?.loopMode = .loop
-        animationView?.play()
+        //animationView?.loopMode = .loop
+        //animationView?.play()
         
         view.addSubview(animationView!)
         
         animation = newAnimation
-        startExport()
+        //startExport()
         
         addButtons()
     }
@@ -58,10 +61,12 @@ class ViewController: UIViewController {
         let outputURL = documentsDirectory.appendingPathComponent("processed.mov")
         try? FileManager.default.removeItem(at: outputURL)
         
-        let duration = CMTime(seconds: animation.duration, preferredTimescale: 600)
+		_duration = animation.duration
+		
+        let duration = CMTime(seconds: animation.duration / 2, preferredTimescale: 600)
         
         /// Create composition
-        let compositionRect = CGRect(x: 0, y: 0, width: size.width, height: size.height)
+        let compositionRect = CGRect(x: 0, y: 0, width: size.width / 4, height: size.height / 4)
         let timerange: CMTimeRange = CMTimeRange(start: .zero, duration: duration)
         
         let composition = AVMutableComposition()
@@ -70,6 +75,8 @@ class ViewController: UIViewController {
         let instructions = AVMutableVideoCompositionInstruction()
         instructions.backgroundColor = UIColor.clear.cgColor
         instructions.timeRange = timerange
+		
+		
         
         
         /// Create main parent layer for AVVideoCompositionCoreAnimationTool
@@ -103,13 +110,16 @@ class ViewController: UIViewController {
         
         /// Add Lottie
         addLottieLayer(animation: animation, to: parentLayer, with: compositionRect)
-        
+		
         /// Set up composition size and framerate
         videoComposition.instructions = [instructions]
         videoComposition.frameDuration = CMTimeMake(value: 1, timescale: Int32(animation.framerate));
         videoComposition.renderSize = size
+		videoComposition.customVideoCompositorClass = AnimationPassthroughCompositor.self
         videoComposition.animationTool = AVVideoCompositionCoreAnimationTool(postProcessingAsVideoLayer: videoCALayer, in: parentLayer)
         
+		print(composition.duration)
+		
         /// Run export
         export(
             composition: composition,
@@ -135,13 +145,15 @@ class ViewController: UIViewController {
         
         layer.addSublayer(animationLayer)
         animationView.play()
+		
+		_layer = animationView
     }
     
     func export(composition: AVMutableComposition,
                 videoComposition: AVMutableVideoComposition,
                 outputUrl: URL,
                 completion: ((URL) -> Void)?) {
-        if let exportSession = AVAssetExportSession(asset: composition, presetName: AVAssetExportPresetHighestQuality) {
+        if let exportSession = AVAssetExportSession(asset: composition, presetName: AVAssetExportPresetHEVCHighestQuality) {
             exportSession.videoComposition = videoComposition
             exportSession.outputURL = outputUrl
             exportSession.timeRange = CMTimeRangeMake(start: .zero, duration: composition.duration)
@@ -318,3 +330,42 @@ extension ViewController {
     }
 }
 
+class AnimationPassthroughCompositor: NSObject, AVVideoCompositing {
+
+    var sourcePixelBufferAttributes: [String : Any]? = [kCVPixelBufferPixelFormatTypeKey as String: kCVPixelFormatType_32ARGB]
+    var requiredPixelBufferAttributesForRenderContext: [String : Any] = [kCVPixelBufferPixelFormatTypeKey as String: kCVPixelFormatType_32ARGB]
+    private var renderContext: AVVideoCompositionRenderContext?
+
+    func renderContextChanged(_ newRenderContext: AVVideoCompositionRenderContext) {
+        renderContext = newRenderContext
+		self._process(nil)
+    }
+
+    func cancelAllPendingVideoCompositionRequests() {
+		
+    }
+
+    func startRequest(_ asyncVideoCompositionRequest: AVAsynchronousVideoCompositionRequest) {
+        guard let track = asyncVideoCompositionRequest.sourceTrackIDs.first?.int32Value, let frame = asyncVideoCompositionRequest.sourceFrame(byTrackID: track) else {
+			asyncVideoCompositionRequest.finish(withComposedVideoFrame: renderContext!.newPixelBuffer()!)
+            return
+        }
+		
+		print("\(asyncVideoCompositionRequest.compositionTime)")
+		self._process(asyncVideoCompositionRequest.compositionTime)
+		
+		asyncVideoCompositionRequest.finish(withComposedVideoFrame: frame)
+    }
+	
+	private func _process(_ _time: CMTime?) {
+		guard let cmtime = _time, cmtime.timescale > 1 else {
+			_layer?.currentProgress = 0.0
+			return
+		}
+        
+		_layer?.currentProgress = (CGFloat(cmtime.value) / CGFloat(cmtime.timescale)) / (CGFloat(_duration ?? 2) / 2.0)
+		
+		print("RENDER AT \(_layer?.currentProgress ?? -1)")
+		//_layer?.forceDisplayUpdate()
+	}
+}

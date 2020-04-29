@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		04407B642459B8370013BA6E /* Bubbles1.json in Resources */ = {isa = PBXBuildFile; fileRef = 04407B632459B8370013BA6E /* Bubbles1.json */; };
 		60C969F35254DDF632B17CF5 /* Pods_LottieExportDemo.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = FAC089111C3FBB75670CC454 /* Pods_LottieExportDemo.framework */; };
 		97B8D67C232798CD001333FE /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 97B8D67B232798CD001333FE /* AppDelegate.swift */; };
 		97B8D67E232798CD001333FE /* ViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 97B8D67D232798CD001333FE /* ViewController.swift */; };
@@ -19,6 +20,7 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
+		04407B632459B8370013BA6E /* Bubbles1.json */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.json; name = Bubbles1.json; path = samples/Bubbles1.json; sourceTree = "<group>"; };
 		8DB9AB2B9E8974AC548B363E /* Pods-LottieExportDemo.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-LottieExportDemo.debug.xcconfig"; path = "Target Support Files/Pods-LottieExportDemo/Pods-LottieExportDemo.debug.xcconfig"; sourceTree = "<group>"; };
 		97B8D678232798CD001333FE /* LottieExportDemo.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = LottieExportDemo.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		97B8D67B232798CD001333FE /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
@@ -76,6 +78,7 @@
 		97B8D67A232798CD001333FE /* LottieExportDemo */ = {
 			isa = PBXGroup;
 			children = (
+				04407B632459B8370013BA6E /* Bubbles1.json */,
 				97B8D67B232798CD001333FE /* AppDelegate.swift */,
 				97B8D67D232798CD001333FE /* ViewController.swift */,
 				97DB8155232A3F5B009291BB /* Helpers.swift */,
@@ -158,6 +161,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				97B8D9A12327B309001333FE /* kanye.png in Resources */,
+				04407B642459B8370013BA6E /* Bubbles1.json in Resources */,
 				97B8D686232798D3001333FE /* LaunchScreen.storyboard in Resources */,
 				97B8D683232798D3001333FE /* Assets.xcassets in Resources */,
 				97B8D99F2327AEF2001333FE /* poppets.mov in Resources */,
@@ -364,7 +368,7 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CODE_SIGN_STYLE = Automatic;
-				DEVELOPMENT_TEAM = BZ82DRDZY8;
+				DEVELOPMENT_TEAM = GWBZQBXRA7;
 				INFOPLIST_FILE = LottieExportDemo/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
