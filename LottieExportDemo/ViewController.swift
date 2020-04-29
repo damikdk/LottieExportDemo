@@ -20,7 +20,7 @@ class ViewController: UIViewController {
     var exportButton: UIButton?
     var oldExportButton: UIButton?
 
-    let size = CGSize(width: 1000, height: 1250)
+    let size = CGSize(width: 360, height: 480)
 
     private var videoWriter: AVAssetWriter?
     
@@ -63,10 +63,10 @@ class ViewController: UIViewController {
         
 		_duration = animation.duration
 		
-        let duration = CMTime(seconds: animation.duration / 2, preferredTimescale: 600)
+        let duration = CMTime(seconds: animation.duration, preferredTimescale: 600)
         
         /// Create composition
-        let compositionRect = CGRect(x: 0, y: 0, width: size.width / 4, height: size.height / 4)
+        let compositionRect = CGRect(x: 0, y: 0, width: size.width , height: size.height )
         let timerange: CMTimeRange = CMTimeRange(start: .zero, duration: duration)
         
         let composition = AVMutableComposition()
@@ -75,9 +75,7 @@ class ViewController: UIViewController {
         let instructions = AVMutableVideoCompositionInstruction()
         instructions.backgroundColor = UIColor.clear.cgColor
         instructions.timeRange = timerange
-		
-		
-        
+    
         
         /// Create main parent layer for AVVideoCompositionCoreAnimationTool
         let parentLayer = CALayer()
@@ -346,12 +344,14 @@ class AnimationPassthroughCompositor: NSObject, AVVideoCompositing {
     }
 
     func startRequest(_ asyncVideoCompositionRequest: AVAsynchronousVideoCompositionRequest) {
+        print("\(asyncVideoCompositionRequest.compositionTime)")
+       
         guard let track = asyncVideoCompositionRequest.sourceTrackIDs.first?.int32Value, let frame = asyncVideoCompositionRequest.sourceFrame(byTrackID: track) else {
 			asyncVideoCompositionRequest.finish(withComposedVideoFrame: renderContext!.newPixelBuffer()!)
             return
         }
 		
-		print("\(asyncVideoCompositionRequest.compositionTime)")
+		//print("\(asyncVideoCompositionRequest.compositionTime)")
 		self._process(asyncVideoCompositionRequest.compositionTime)
 		
 		asyncVideoCompositionRequest.finish(withComposedVideoFrame: frame)
@@ -363,7 +363,7 @@ class AnimationPassthroughCompositor: NSObject, AVVideoCompositing {
 			return
 		}
         
-		_layer?.currentProgress = (CGFloat(cmtime.value) / CGFloat(cmtime.timescale)) / (CGFloat(_duration ?? 2) / 2.0)
+		//_layer?.currentProgress = (CGFloat(cmtime.value) / CGFloat(cmtime.timescale)) / (CGFloat(_duration ?? 2) / 2.0)
 		
 		print("RENDER AT \(_layer?.currentProgress ?? -1)")
 		//_layer?.forceDisplayUpdate()
